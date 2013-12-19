@@ -18,7 +18,7 @@ class FunConwaySpec extends FlatSpec {
     val expectedCells = List((0,0),(0,1),(0,2),(0,3),
       (1,0),(1,1),(1,2),(1,3),
       (2,0),(2,1),(2,2), (2,3))
-    assert(getCandidateCells(initialCells).toSet === expectedCells.toSet)
+    assert(candidateCells(initialCells).toSet === expectedCells.toSet)
   }
 
   it should "count live neighbors" in {
@@ -26,6 +26,13 @@ class FunConwaySpec extends FlatSpec {
     assert(neighborCount((0,1), liveCells) === 2)
     assert(neighborCount((1,1), liveCells) === 1)
     assert(neighborCount((5,5), liveCells) === 0)
+  }
+
+  it should "augment cells with count and liveness" in {
+    val liveCells = List((1,1), (1,2))
+    assert(augmentCell((0,1), liveCells) === ((0,1),2,false))
+    assert(augmentCell((1,1), liveCells) === ((1,1),1,true))
+    assert(augmentCell((5,5), liveCells) === ((5,5),0,false))
   }
 
 
@@ -38,7 +45,7 @@ class FunConwaySpec extends FlatSpec {
       } yield (nx, ny)
   }
 
-  def getCandidateCells(cells: List[Cell]) = {
+  def candidateCells(cells: List[Cell]) = {
     cells.toSet.flatMap((cell: Cell) => neighbors(cell)) ++ cells
   }
 
@@ -46,7 +53,9 @@ class FunConwaySpec extends FlatSpec {
     neighbors(cell).filter(c => liveCells.contains(c)).size
   }
 
-
+  def augmentCell(cell: Cell, liveCells: List[Cell]) = {
+    (cell, neighborCount(cell, liveCells), liveCells.contains(cell))
+  }
 }
 
 class FunConway {
