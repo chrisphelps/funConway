@@ -21,6 +21,12 @@ class FunConwaySpec extends FlatSpec {
     assert(getCandidateCells(initialCells).toSet === expectedCells.toSet)
   }
 
+  it should "count live neighbors" in {
+    val liveCells = List((1,1), (1,2))
+    assert(neighborCount((0,1), liveCells) === 2)
+    assert(neighborCount((1,1), liveCells) === 1)
+    assert(neighborCount((5,5), liveCells) === 0)
+  }
 
 
   def neighbors(cell: Cell) = cell match {
@@ -35,6 +41,11 @@ class FunConwaySpec extends FlatSpec {
   def getCandidateCells(cells: List[Cell]) = {
     cells.toSet.flatMap((cell: Cell) => neighbors(cell)) ++ cells
   }
+
+  def neighborCount(cell: Cell, liveCells: List[Cell]) = {
+    neighbors(cell).filter(c => liveCells.contains(c)).size
+  }
+
 
 }
 
