@@ -35,6 +35,25 @@ class FunConwaySpec extends FlatSpec {
     assert(augmentCell((5,5), liveCells) === ((5,5),0,false))
   }
 
+  it should "kill underpopulated cells" in {
+    val cell = ((1,1), 1, true)
+    assert(shouldLive(cell) === false)
+  }
+
+  it should "kill overpopulated cells" in {
+    val cell = ((1,1), 4, true)
+    assert(shouldLive(cell) === false)
+  }
+
+  it should "allow normal cells to live" in {
+    val cell = ((1,1), 2, true)
+    assert(shouldLive(cell) === true)
+  }
+
+  it should "reproduce cells" in {
+    val cell = ((1,1), 3, false)
+    assert(shouldLive(cell) === true)
+  }
 
   def neighbors(cell: Cell) = cell match {
     case (x, y) =>
@@ -56,6 +75,17 @@ class FunConwaySpec extends FlatSpec {
   def augmentCell(cell: Cell, liveCells: List[Cell]) = {
     (cell, neighborCount(cell, liveCells), liveCells.contains(cell))
   }
+
+  def shouldLive(augmentedCell: (Cell, Int, Boolean)) = {
+    augmentedCell match {
+      case (c, n, true) if n < 2 => false
+      case (c, n, true) if n > 3 => false
+      case (c, n, true) => true
+      case (c, n, false) if n == 3 => true
+      case _ => false
+    }
+  }
+
 }
 
 class FunConway {
