@@ -55,6 +55,23 @@ class FunConwaySpec extends FlatSpec {
     assert(shouldLive(cell) === true)
   }
 
+  it should "maintain the block" in {
+    val liveCells = List((1,1), (1,2), (2,1), (2,2))
+    assert(evolve(liveCells).toSet === liveCells.toSet)
+  }
+
+  it should "blink the blinker" in {
+    val liveCells = List((1,0), (1,1), (1,2))
+    val expectedCells = List((0,1), (1,1), (2,1))
+    assert(evolve(liveCells).toSet === expectedCells.toSet)
+  }
+
+  it should "glide the glider" in {
+    val liveCells = List((0,2),(1,0),(1,2),(2,1),(2,2))
+    val expectedCells = List((0,2),(1,3),(2,1),(2,2),(2,3))
+    assert(evolve(evolve(liveCells)).toSet === expectedCells.toSet)
+  }
+
   def neighbors(cell: Cell) = cell match {
     case (x, y) =>
       for {
@@ -86,6 +103,12 @@ class FunConwaySpec extends FlatSpec {
     }
   }
 
+  def evolve(cells: List[Cell]) = {
+    val candidates = candidateCells(cells)
+    val augmentedCandidates = candidates.map(c => augmentCell(c, cells))
+    val newgeneration = augmentedCandidates.filter(c => shouldLive(c)).map{ac => ac._1}
+    newgeneration.toList
+  }
 }
 
 class FunConway {
